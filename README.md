@@ -80,10 +80,12 @@ Then open [http://localhost:8000](http://localhost:8000) in your browser.
 return [
     '/' => ['App\Controllers\HomeController', 'index']
 ];
+```
 
 
 Create a Controller (app/Controllers/HomeController.php)
 
+```
 
 namespace App\Controllers;
 
@@ -93,14 +95,18 @@ class HomeController {
     }
 }
 
+```
 
 Build a View (resources/views/home.php)
+
+```
 
 <h1 hx-get="/some-action" hx-swap="outerHTML">Click me</h1>
 
 <div x-data="{ open: false }" @click="open = !open">
     <p x-show="open">Hello from Alpine!</p>
 </div>
+```
 
 
 🧪 Philosophy
