@@ -2,11 +2,14 @@
 
 namespace App\app\Http\Controllers;
 
-class UserController
+use App\config\App;
+
+class UserController extends App
 {
     public function __construct() {
-echo 'hiiiii'   ; }
+        $this->view('index');
+}
 function index() {
-    echo 'indesdfdsafx';
+    $this->view('index');
 }
 }

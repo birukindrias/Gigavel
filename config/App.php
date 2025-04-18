@@ -6,6 +6,8 @@ use App\app\Http\Controllers\UserController;
 
 class App
 {
+    public string $layout = 'app';
+
     public array $routes;
     public function __construct()
     {
@@ -14,7 +16,7 @@ class App
     function router()
     {
         $this->routes = [
-            ['/hia' => [UserController::class, 'index']],
+            ['/hi' => [UserController::class, 'index']],
             // ['/h' => 'hi']
 
         ];
@@ -23,7 +25,7 @@ class App
             if ($route[$uri]) {
                 if (!class_exists($route[$uri][0])) {
                     echo 'class doesnt exist';
-                    return ;
+                    return;
                 }
                 $controller_class =  new  $route[$uri][0];
                 $f = $route[$uri][1];
@@ -31,37 +33,40 @@ class App
                     return 'functionn doesnt exist';
                 }
                 $controller_class->$f();
-            }else {
-                echo 'route dosnt found';
+            } else {
+                return $this->view('404');
             }
         }
     }
-    function render()
+    function view($page, $data = [] ?? null)
     {
-        // $dir = scandir(__DIR__.'/../resources/views/');
-        // foreach ($dir as $page) {
 
-        // }
-        $template_name = $_GET['page'] ?? 'default';
-        $template_dir = dirname(__DIR__) . '/resources/views/components/';
+        // var_dump( $this->getLayout());
+        // var_dump( $this->getPage($page));
 
-        // Sanitize input
-        $template_name = basename($template_name);
-
-        // Determine full path
-        $php_file = $template_dir . $template_name . '.php';
-        $html_file = $template_dir . $template_name . '.html';
+        if (file_exists(dirname(__DIR__) . '/resources/views/' . $page . '.php')) {
+            // echo 'yes';
+            // exit;
+            echo str_replace('{content}', $this->getPage($page), $this->getLayout()); // PHP is executed ✅
+            return;
+        } else {
+            $this->view('404');
+            return;
+        }
+    }
+    public function getLayout()
+    {
+        ob_start();
+        include_once dirname(__DIR__) . '/resources/views/layout/' . $this->layout . '.php';
+        return ob_get_clean();
+    }
+    public function getPage($page)
+    {
+        // var_dump(dirname(__DIR__) . '/resources/views/' . $page . '.php');
+        // exit;
 
         ob_start();
-
-        if (file_exists($php_file)) {
-            include $php_file; // PHP is executed ✅
-        } elseif (file_exists($html_file)) {
-            include $html_file; // Still allow HTML with PHP inside ✅
-        } else {
-            echo "<h1>404 - Page not found</h1>";
-        }
-
-        echo ob_get_clean();
+        include_once dirname(__DIR__) . '/resources/views/' . $page . '.php';
+        return ob_get_clean();
     }
 }

@@ -117,7 +117,7 @@ Build a View (resources/views/home.php)
 **Gigavel** is about fast iteration and keeping your tools out of your way.
 It gives you enough Laravel-style structure to scale while staying lean and snappy.
   
-📜 License
+# 📜 License
 
 MIT © Biruk Endrias
 
