@@ -3,6 +3,8 @@
 namespace App\config;
 
 use App\app\Http\Controllers\UserController;
+use App\config\Route;
+use ReflectionClass;
 
 class App
 {
@@ -15,34 +17,53 @@ class App
     }
     function router()
     {
-        $this->routes = [
-            ['/hi' => [UserController::class, 'index']],
-            // ['/h' => 'hi']
 
-        ];
-        $uri = $_SERVER["REQUEST_URI"];
-        foreach ($this->routes as $route) {
-            if ($route[$uri]) {
-                if (!class_exists($route[$uri][0])) {
-                    echo 'class doesnt exist';
-                    return;
+
+
+        $routes = [];
+
+        // 1. Set your controller folder and base namespace
+        $controllerDir = __DIR__ . '/../app/Http/Controllers';
+        $baseNamespace = 'App\\app\\Http\\Controllers\\';
+        
+        // 2. Scan all PHP files in the controller folder
+        $controllerFiles = glob("$controllerDir/*.php");
+        
+        foreach ($controllerFiles as $file) {
+            require_once $file;
+        
+            $className = $baseNamespace . basename($file, '.php');
+        
+            if (!class_exists($className)) continue;
+        
+            $ref = new ReflectionClass($className);
+        
+            foreach ($ref->getMethods() as $method) {
+                foreach ($method->getAttributes(Route::class) as $attr) {
+                    $route = $attr->newInstance();
+                    $key = "{$route->method}:{$route->path}";
+                    $routes[$key] = [$className, $method->getName()];
                 }
-                $controller_class =  new  $route[$uri][0];
-                $f = $route[$uri][1];
-                if (!function_exists($controller_class->$f())) {
-                    return 'functionn doesnt exist';
-                }
-                $controller_class->$f();
-            } else {
-                return $this->view('404');
             }
         }
+        
+        $method = $_SERVER['REQUEST_METHOD'];
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $key = "$method:$uri";
+
+        if (isset($routes[$key])) {
+            [$class, $methodName] = $routes[$key];
+            $controller = new $class();
+            echo $controller->$methodName();
+        } else {
+            http_response_code(404);
+            return $this->view('404');
+        }
+
     }
     function view($page, $data = [] ?? null)
     {
 
-        // var_dump( $this->getLayout());
-        // var_dump( $this->getPage($page));
 
         if (file_exists(dirname(__DIR__) . '/resources/views/' . $page . '.php')) {
             // echo 'yes';
