@@ -17,6 +17,8 @@
 
 ## 📁 Directory Structure
 
+```
+
 gigavel/
 ├── app/
 │   └── Controllers/
@@ -32,6 +34,7 @@ gigavel/
 ├── composer.json
 └── README.md
 
+```
 
 ---
 
