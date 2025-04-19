@@ -1,0 +1,18 @@
+<?php
+
+
+function methods($a) {
+  if ($a == 'mig') {
+    # code...
+    echo 'migration';
+  }
+}
+function run() {
+exec('php -S localhost:8080 ');}
+
+
+$result = match($argc){
+  1 => run(),
+  2 => methods($argv),
+};
+$result;

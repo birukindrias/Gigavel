@@ -9,6 +9,7 @@
     <meta name="keywords" content="PHP, framework, web development, Gigavel">
     <meta name="author" content="Gigavel Team">
 
+<link rel="icon" href="/assets/ico.png" type="image/png">
     <!-- Tailwind CSS -->
 
     <script  src="/assets/tailwind.js"></script>

@@ -13,7 +13,9 @@ class App
     public array $routes;
     public function __construct()
     {
-        $this->router();
+      $this->router();
+      $this->env('h');
+      echo $_ENV['DB_USERNAME'];    
     }
     function router()
     {
@@ -90,4 +92,35 @@ class App
         include_once dirname(__DIR__) . '/resources/views/' . $page . '.php';
         return ob_get_clean();
     }
+    public function env($key,$val = null) {
+      #scan dir 
+      #get the env
+      #find it from there 
+      #and to set it set it from there 
+      # code...
+      $path = dirname(__DIR__).'/.env';
+            /*var_dump(file_get_contents($env)*/
+            /*);*/
+    
+    if (!file_exists($path)) {
+        throw new Exception(".env file not found at: $path");
+    }
+
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+    foreach ($lines as $line) {
+        // Skip comments
+        if (str_starts_with(trim($line), '#')) continue;
+
+        [$key, $value] = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+
+        // Remove surrounding quotes if present
+        $value = trim($value, '"\'');
+
+        putenv("$key=$value");
+        $_ENV[$key] = $value;
+        $_SERVER[$key] = $value;
+    }}
 }
