@@ -1,23 +1,35 @@
 <?php
+namespace App;
+use App\config\Texts;
 
 
-function methods($a): void   {
-  if ($a == 'mig') {
-    # code...
-    // add EOF TO THE END OF THE FILE AND ECHO THE FILE
-    
-
-    echo 'migration n' ;
-  }
+class run
+{
+  use Texts;
+  
+public function __construct($argc,$argv) {
+ 
+  $result = match($argc){
+    1 =>   exec('php -S localhost:8080 ')    ,
+    2 => $this->methods($argv[1]),
+    default => $this->methods($argv),
+  };
+  $result;
 }
-        // $referrer = Customer::where('phone_number', $referredByPhone)->first();
-
-function run() {
-exec('php -S localhost:8080 ');}
-
-
-$result = match($argc){
-  1 => run(),
-  2 => methods($argv[1]),
-};
-$result;
+public function methods($a): void   {
+  $pm = __DIR__."/database/migrations/";
+  
+    if ($a[1] == 'make:migration') {
+      $file = fopen($pm.date('Y_m_d_').$a[2].'_table.php','wra',true);
+      fwrite($file,$filemig);
+     exec("touch .'$a[2]'.");
+      // add EOF TO THE END OF THE FILE AND ECHO THE FILE
+      
+  
+      echo 'migration n' ;
+    }
+  }
+          // $referrer = Customer::where('phone_number', $referredByPhone)->first();
+  
+}
+new run($argc,$argv); 
