@@ -20,8 +20,7 @@ class Database
         try {
             $user = $_ENV['DB_USERNAME'] ?? '';
             $pass = $_ENV['DB_PASSWORD'] ?? '';
-
-            $dsn = "mysql:host=" . ($_ENV['DB_HOST'] ?? 'localhost') . ";dbname=" . ($_ENV['DB_NAME'] ?? 'mvc') . ";port=" . ($_ENV['DB_PORT'] ?? '3306');
+            $dsn = "mysql:host=" . ($_ENV['DB_HOST'] ?? 'localhost') . ";dbname=" . ($_ENV['DB_DATABASE'] ?? 'mvc') . ";port=" . ($_ENV['DB_PORT'] ?? '3306');
 
             $this->pdo = new PDO($dsn, $user, $pass);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
