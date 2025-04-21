@@ -1,18 +1,23 @@
 <?php
 
 
-function methods($a) {
+function methods($a): void   {
   if ($a == 'mig') {
     # code...
-    echo 'migration';
+    // add EOF TO THE END OF THE FILE AND ECHO THE FILE
+    
+
+    echo 'migration n' ;
   }
 }
+        // $referrer = Customer::where('phone_number', $referredByPhone)->first();
+
 function run() {
 exec('php -S localhost:8080 ');}
 
 
 $result = match($argc){
   1 => run(),
-  2 => methods($argv),
+  2 => methods($argv[1]),
 };
 $result;

@@ -4,6 +4,7 @@ namespace App\config;
 
 use App\app\Http\Controllers\UserController;
 use App\config\Route;
+use PDO;
 use ReflectionClass;
 
 class App
@@ -11,9 +12,19 @@ class App
     public string $layout = 'app';
 
     public array $routes;
+    private $host = "localhost";
+    private $db_name = "sile";
+    private $username = "l";
+    private $password = "l";
+    private $conn;
+    public Database $db;
+     public static $app;
     public function __construct()
     {
+        self::$app = $this;
+        
       $this->router();
+      $this->db= new Database();
       $this->env('h');
       echo $_ENV['DB_USERNAME'];    
     }
@@ -92,6 +103,40 @@ class App
         include_once dirname(__DIR__) . '/resources/views/' . $page . '.php';
         return ob_get_clean();
     }
+    public function db()  {
+        
+        try {
+            $dsn = "mysql:host={$this->host};dbname={$this->db_name};charset=utf8mb4";
+            $this->conn = new PDO($dsn, $this->username, $this->password);
+            // Set error mode to exception
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch(PDOException $e) {
+            echo "Connection failed: " . $e->getMessage();
+        }
+// create migraton table
+// on migrate check if the class names are exist in it
+// dont migrate if exist not migarte
+// orm for manuplating data
+        return $this->conn;
+    }
+    public function migrate() {
+        $path = dirname(__DIR__) . '/database/Migrations/';
+
+        $writtenMigrations = array_filter(scandir($path),fn($file)=>pathinfo($file,PATHINFO_EXTENSION)=== "php");
+        $existing = this->createMigration;
+        $this->createMigrationsTable();
+        $migrate= array_diff($writtenMigrations,$existing);
+        
+
+        foreach ($migrate as $migration) {
+        $pdo->conn->query("INSERT migrations(name) value('$migration')");
+        }
+    }
+   public function createMigrationsTable() {
+      $conn->query->exc("IF migrations DONT EXIST CREATE TABLE migrations(name)")  ;
+      
+      return $conn->query->exc("SELECT * FROM migrations") ; 
+    }
     public function env($key,$val = null) {
       #scan dir 
       #get the env
@@ -121,6 +166,6 @@ class App
 
         putenv("$key=$value");
         $_ENV[$key] = $value;
-        $_SERVER[$key] = $value;
+        // $_SERVER[$key] = $value;
     }}
 }
