@@ -8,9 +8,9 @@ class User extends Model
 {
 
     // make the foll two not enforced
-   public $table ="users";
+   public static string $table ="users";
 
-   public $fillable = [''] ;
+   public  array $fillable = ['name'] ;
 
 
 }

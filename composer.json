@@ -29,7 +29,16 @@
   ],
   "require-dev": {
     "phpunit/phpunit": "^10.0"
+    ,
+    "lorisleiva/tailwindcss-php": "dev-main"
+
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/lorisleiva/tailwindcss-php"
+    }
+  ],
   "minimum-stability": "stable",
   "prefer-stable": true
 }

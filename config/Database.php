@@ -8,11 +8,15 @@ use PDOException;
 class Database
 {
     public PDO $pdo;
+    public static $db;
     public array $migrationsArray = [];
 
-    public function __construct(
-    ) {
+    public function __construct()
+    {
+        
+        self::$db = $this;
         $this->connect();
+
     }
 
     private function connect(): void
@@ -24,47 +28,49 @@ class Database
 
             $this->pdo = new PDO($dsn, $user, $pass);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
         } catch (PDOException $e) {
             echo '<div style="background-color:white; color:red">' . $e->getMessage() . '</div>';
         }
     }
 
-    public function applyMigrations(string $mode): bool
+    public static function applyMigrations(string $mode)
     {
+        $self = new self();
         $path = dirname(__DIR__) . '/database/Migrations/';
         $writtenMigrations = array_filter(scandir($path), fn($file) => pathinfo($file, PATHINFO_EXTENSION) === 'php');
-
-        $this->createMigrationsTable();
-        $existing = $this->existingMigrations();
-        $newMigrations = array_diff($writtenMigrations, $existing);
-
-        if ($mode === 'down') {
-            foreach ($newMigrations as $migrationName) {
-                require_once $path . $migrationName;
-                $className = pathinfo($migrationName, PATHINFO_FILENAME);
-                (new $className())->down();
-            }
-
-            return true;
-        }
+        $self->createMigrationsTable();
+        $existing = $self->existingMigrations();
+        
+        $newMigrations = array_diff( $writtenMigrations,$existing);
 
         foreach ($newMigrations as $migrationName) {
-            require_once $path . $migrationName;
-            $className = pathinfo($migrationName, PATHINFO_FILENAME);
-            (new $className())->$mode();
+         
+        if ($migrationName === '.' || $migrationName === '..') {    
+            continue; // Skip current and parent directory entries
+        }
+      
+        $before = get_declared_classes();
+            require_once $path . $migrationName ;
+            $after = get_declared_classes();
+            
+            $newClasses = array_diff($after, $before);
+            $className = reset($newClasses); // take the first one added
+      
+            $migrationInstance = new $className();
+           
+            $query = $migrationInstance->up();
+            $self->pdo->exec($query );
 
-            $this->migrationsArray[] = $migrationName;
+            $self->migrationsArray[] = pathinfo($migrationName.'.php', PATHINFO_FILENAME) ;
         }
 
-        if (!empty($this->migrationsArray)) {
-            $this->saveMigrations($this->migrationsArray);
-            $this->log('MIGRATIONS APPLIED SUCCESSFULLY!');
+        if (!empty($self->migrationsArray)) {
+            $self->saveMigrations($self->migrationsArray);
+           return $self->log('MIGRATIONS APPLIED SUCCESSFULLY!');
         } else {
-            $this->log('NOTHING TO MIGRATE!');
+            return $self->log('NOTHING TO MIGRATE!');
         }
 
-        return true;
     }
 
     private function createMigrationsTable(): void
@@ -81,16 +87,15 @@ class Database
 
     private function existingMigrations(): array
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM migrations");
+        $stmt = $this->pdo->prepare("SELECT migration_name FROM migrations");
         $stmt->execute();
-
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
     }
 
     private function saveMigrations(array $migrations): void
     {
         $values = implode(',', array_map(fn(string $m) => "('$m')", $migrations));
-        $sql = "INSERT INTO migrations ('name') VALUES $values";
+        $sql = "INSERT INTO migrations (migration_name) VALUES $values";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
     }
