@@ -24,10 +24,36 @@ class Database
         try {
             $user = $_ENV['DB_USERNAME'] ?? '';
             $pass = $_ENV['DB_PASSWORD'] ?? '';
-            $dsn = "mysql:host=" . ($_ENV['DB_HOST'] ?? 'localhost') . ";dbname=" . ($_ENV['DB_DATABASE'] ?? 'mvc') . ";port=" . ($_ENV['DB_PORT'] ?? '3306');
+            $type = $_ENV['DB_CONNECTION'] ?? '';
+            $dsn = sprintf(
+                '%s:host=%s;dbname=%s;port=%s',
+                $_ENV['DB_CONNECTION'] ?? 'mysql',
+                $_ENV['DB_HOST'] ?? 'localhost',
+                $_ENV['DB_DATABASE'] ?? 'mvc',
+                $_ENV['DB_PORT'] ?? '3306'
+            );
 
-            $this->pdo = new PDO($dsn, $user, $pass);
+            if ($type === 'sqlite') {
+                $path = dirname(__DIR__). '/database/' . $_ENV['DB_DATABASE'] ?? '';
+                if (!file_exists($path)) {
+                    mkdir(dirname($path), 0777, true);
+                    touch($path);
+                }
+                $this->pdo = new PDO("sqlite:$path");
+                $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } elseif ($type === 'pgsql') {
+                $host = $_ENV['DB_HOST'] ?? '';
+                $port = $_ENV['DB_PORT'] ?? '5432';
+                $dbname = $_ENV['DB_DATABASE'] ?? '';
+                $user = $_ENV['DB_USERNAME'] ?? '';
+                $pass = $_ENV['DB_PASSWORD'] ?? '';     
+                $this->pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $user, $pass);
+                $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } elseif ($type === 'mysql') {
+                $this->pdo = new PDO($dsn, $user, $pass);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            }
+                   
         } catch (PDOException $e) {
             echo '<div style="background-color:white; color:red">' . $e->getMessage() . '</div>';
         }

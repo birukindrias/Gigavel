@@ -15,7 +15,7 @@ class UserController extends Controller
     {
         App::$app->view('index');
     }
-    #[Route('GET', '/create')]
+    #[Route('GET', '/create/{id}')]
 
     public function create()
     {
@@ -27,12 +27,13 @@ class UserController extends Controller
     {
         $request = new Request(); 
         $user = new User();
-        // $user->save($request->all());
-        // var_dump(['name'=> $request->get('name')]);
-        $user->save(['name'=> $request->get('name')]);
-        // var_dump($user);
-        // ->with('success','created acc')
-        return $this->redirect('/');
+        // $data = validate([
+        //     $request->name => 'required|max:255',
+        // ])
+//         $user->save(['name'=> $request->get('name')]);
+// $user->save($data);
+//         ->with('success','created acc')
+//         return $this->redirect('/');
     }
     
 
@@ -42,5 +43,10 @@ class UserController extends Controller
     public function edit()
     {
         App::$app->view('users/create');
+    }
+    #[Route('GET', '/api/')]
+    public function api()
+    {
+        App::$app->view('index');
     }
 }

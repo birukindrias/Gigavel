@@ -58,13 +58,41 @@ class run
 
     }
     $pm = __DIR__ . "/app/Http/Models/";
+    $filemig=
+    '<?php
+namespace App\App\models;
 
+use App\config\Model;
+class ' . ucfirst($filename) . ' extends Model 
+{
+  
+
+    public static function tableName(): string
+    {
+        return "' . $filename . 's";
+    }
+    public function rules(): array
+    {
+        return [
+          "' . $filename . '"=> [self::RULE_REQUIRED],
+        ];
+    }
+    public function attrs(): array
+    {
+        return [
+           
+
+        ];
+    }
+      
+}
+';
     if ($a[1] == 'make:model') {
-      $file = fopen($pm . date('Y_m_d_') . $a[2] . '_table.php', 'wra', true);
+      $file = fopen($pm . $a[2] . '.php', 'wra', true);
       if (fwrite($file, $filemig)) {
 
         PHP_EOL;
-        echo "[" . date("Y-m-d H:i:s") . "] - " . date('Y_m_d_') . $a[2] . '_table.php ' . " migration created successfully @   " . $pm . date('Y_m_d_') . $a[2] . '_table.php' . PHP_EOL;
+        echo  " model created successfully  @ " . $pm . date('Y_m_d_') . $a[2] . '.php'   . PHP_EOL;
       }
       fclose($file);
       // add EOF TO THE END OF THE FILE AND ECHO THE FILE
