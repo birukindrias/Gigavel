@@ -6,8 +6,8 @@ use PDO;
 
 abstract class Model
 {
-   
-    
+
+
     public function __construct(
         public ?int $id = null,
         public ?string $created_at = null,
@@ -16,38 +16,38 @@ abstract class Model
         $this->created_at = date('Y-m-d H:i:s');
         $this->updated_at = date('Y-m-d H:i:s');
     }
-     public  array $fillable = [];
-     public static String $table = '';
+    public  array $fillable = [];
+    public static String $table = '';
 
-     public function save($array): bool
-{
-    $table = static::$table;
+    public function save($array): bool
+    {
+        $table = static::$table;
 
-    $columns = [];
-    $placeholders = [];
+        $columns = [];
+        $placeholders = [];
 
-    foreach ($array as $key => $value) {
-        $columns[] = "`$key`";
-        $placeholders[] = ":$key";
+        foreach ($array as $key => $value) {
+            $columns[] = "`$key`";
+            $placeholders[] = ":$key";
+        }
+
+        if (empty($columns)) return false;
+
+        $sql = "INSERT INTO {$table} (" . implode(',', $columns) . ") VALUES (" . implode(',', $placeholders) . ")";
+
+        // Debugging
+        var_dump($sql);
+
+        $app = new App('db'); // assuming this returns db object with ->prepare()
+
+        $stmt = $app->db->prepare($sql);
+
+        foreach ($array as $key => $value) {
+            $stmt->bindValue(":$key", $value);
+        }
+        var_dump($stmt);
+        return $stmt->execute();
     }
-
-    if (empty($columns)) return false;
-
-    $sql = "INSERT INTO {$table} (" . implode(',', $columns) . ") VALUES (" . implode(',', $placeholders) . ")";
-
-    // Debugging
-    var_dump($sql);
-
-    $app = new App('db'); // assuming this returns db object with ->prepare()
-
-    $stmt = $app->db->prepare($sql);
-
-    foreach ($array as $key => $value) {
-        $stmt->bindValue(":$key", $value);
-    }
-
-    return $stmt->execute();
-}
 
     public function savse($array): bool
     {
@@ -55,31 +55,31 @@ abstract class Model
         // if (!$array) {
         //     $columns = $this->fillable;
         // }
-    //  $key = [];
-    //  $val = [];
-    //  foreach ($array as $key => $value) {
-    //     $key[] = $key;
-    //     $val[] = $value;    
-    //  }
-     
-    //  $sql = "INSERT INTO $table (".implode(',',$key).") VALUES(".implode(',',$val).")";
+        //  $key = [];
+        //  $val = [];
+        //  foreach ($array as $key => $value) {
+        //     $key[] = $key;
+        //     $val[] = $value;    
+        //  }
 
-     $columns = [];
-     $values = [];
+        //  $sql = "INSERT INTO $table (".implode(',',$key).") VALUES(".implode(',',$val).")";
 
-     foreach ($array as $key => $value) {
-         $columns[] = "`" . $key . "`";
-         $values[] = "'" .$key . "'";
-     }
+        $columns = [];
+        $values = [];
 
-     if (empty($columns)) return false;
+        foreach ($array as $key => $value) {
+            $columns[] = "`" . $key . "`";
+            $values[] = "'" . $key . "'";
+        }
 
-     $sql = "INSERT INTO {$table} (" . implode(',', $columns) . ") VALUES (" . implode(',', $key) . ")";
+        if (empty($columns)) return false;
+
+        $sql = "INSERT INTO {$table} (" . implode(',', $columns) . ") VALUES (" . implode(',', $key) . ")";
 
 
-     //  $sql = "INSERT INTO $table (" . implode(',', array_keys($array)) . ") VALUES (" . implode(',',array_values($array)) . ")";
-      var_dump( $sql); 
-       $app = new App('db');
+        //  $sql = "INSERT INTO $table (" . implode(',', array_keys($array)) . ") VALUES (" . implode(',',array_values($array)) . ")";
+        var_dump($sql);
+        $app = new App('db');
         $stmt = $app->db->prepare($sql);
         //  App::$app->db->prepare($sql);
         // ::$app
@@ -89,15 +89,17 @@ abstract class Model
 
         return $stmt->execute();
     }
-    public function save2($array): bool
+    public function saveall($array): bool
     {
         $table = static::$table;
         if (!$array) {
             $columns = $this->fillable;
         }
+        var_dump($this->fillable);
         $placeholders = array_map(fn($col) => ":$col", $array);
         $sql = "INSERT INTO $table (" . implode(',', $array) . ") VALUES (" . implode(',', $placeholders) . ")";
-      var_dump( $sql);  $app = new App('db');
+        var_dump($sql);
+        $app = new App('db');
         $stmt = $app->db->prepare($sql);
         //  App::$app->db->prepare($sql);
         // ::$app

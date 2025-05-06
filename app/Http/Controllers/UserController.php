@@ -15,7 +15,7 @@ class UserController extends Controller
     {
         App::$app->view('index');
     }
-    #[Route('GET', '/create/{id}')]
+    #[Route('GET', '/create')]
 
     public function create()
     {
@@ -31,9 +31,9 @@ class UserController extends Controller
         //     $request->name => 'required|max:255',
         // ])
 //         $user->save(['name'=> $request->get('name')]);
-// $user->save($data);
+$user->save(['name' =>  $request->get('name')]);
 //         ->with('success','created acc')
-//         return $this->redirect('/');
+        return $this->redirect('/');
     }
     
 

@@ -105,7 +105,7 @@ class Database
             CREATE TABLE IF NOT EXISTS migrations (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 migration_name VARCHAR(255) NOT NULL
-            ) ENGINE=INNODB;
+            ) ;
         SQL;
 
         $this->pdo->exec($sql);

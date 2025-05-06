@@ -10,7 +10,7 @@
                       email VARCHAR(50),
                       password VARCHAR(50)
            )
-           ENGINE = INNODB;";
+           ;";
         }
         public function down()
         {
